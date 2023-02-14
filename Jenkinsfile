@@ -39,13 +39,13 @@ pipeline{
             parallel{
                 stage('terraform Format'){
                     steps {
-                        sh 'terraform fmt'
+                        sh 'terraform fmt -recursive -check=true'
                     }
                 }
                 stage('terraform Validate'){
                     steps {
                         sh '''
-                            terraform init 
+                            terraform init
                             terraform validate
                         '''        
                     }
@@ -56,6 +56,27 @@ pipeline{
             steps {
                 sh 'terraform plan'
             }
+        }
+        stage('Deploy'){
+            when {
+                branch 'qa'
+            }
+            steps {
+                sh '''
+                terraform apply --auto-aprove
+                '''
+            }
+        }
+    }
+    post {
+        success { 
+            sh 'echo Completed...'
+        }
+        failure {
+            sh 'Something went wrong'
+        }
+        cleanup {
+            sh 'rm -rf *'
         }
     }
 }

@@ -9,14 +9,10 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-west-2"
+  region = var.region
 }
 
-resource "aws_instance" "my_server" {
-  ami           = "ami-830c94e3"
-  instance_type = "t2.micro"
-
-  tags = {
-  Name = "my test server"
-  }
+module "vpc" {
+  source = "./module"
+  region = var.region
 }
